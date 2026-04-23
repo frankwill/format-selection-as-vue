@@ -3,6 +3,7 @@
   "publisher": "frankwsb",
   "displayName": "Format Selection As VUE",
   "description": "Format the selected text within literal strings in VUE format.",
+  "icon": "img/icon.png",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.116.0"
@@ -12,6 +13,11 @@
   ],
   "activationEvents": [
     "onCommand:format-template-string-as-vue.format"
+  ],
+  "keywords": [
+    "template string",
+    "formater html",
+    "string literals"
   ],
   "main": "./dist/extension.js",
   "contributes": {
