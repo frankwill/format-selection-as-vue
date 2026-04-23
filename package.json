@@ -1,5 +1,5 @@
 {
-  "name": "format-selection-as-vue",
+  "name": "format-template-string-as-vue",
   "publisher": "frankwill",
   "displayName": "Format Selection As VUE",
   "description": "Format the selected text within literal strings in VUE format.",
@@ -11,13 +11,13 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:format-selection-as-vue.format"
+    "onCommand:format-template-string-as-vue.format"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "format-selection-as-vue.format",
+        "command": "format-template-string-as-vue.format",
         "title": "FRANKWSB: Format Template String as Vue"
       }
     ]

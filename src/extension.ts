@@ -4,7 +4,7 @@ import * as parserHtml from 'prettier/plugins/html';
 
 export function activate(context: vscode.ExtensionContext) {
   const disposable = vscode.commands.registerCommand(
-    'format-selection-as-vue.format',
+    'format-template-string-as-vue.format',
     async () => {
       const editor = vscode.window.activeTextEditor;
       if (!editor) { return; };
