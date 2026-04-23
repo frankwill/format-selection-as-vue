@@ -1,26 +1,74 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import * as prettier from 'prettier/standalone';
+import * as parserHtml from 'prettier/plugins/html';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+  const disposable = vscode.commands.registerCommand(
+    'format-selection-as-vue.format',
+    async () => {
+      const editor = vscode.window.activeTextEditor;
+      if (!editor) { return; };
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "format-selection-as-vue" is now active!');
+      const selection = editor.selection;
+      const selectedText = editor.document.getText(selection);
+			const line = editor.document.lineAt(selection.start.line);
+			const baseIndent = line.text.match(/^\s*/)?.[0] ?? '';
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('format-selection-as-vue.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Format Selection As VUE!');
-	});
+      try {
+				const sorted = sortAttributes(selectedText);
 
-	context.subscriptions.push(disposable);
+				const formatted = await prettier.format(sorted, {
+					parser: 'html',
+					plugins: [parserHtml],
+					singleAttributePerLine: true,
+				});
+
+				const formattedIndented = indentToSelectionBase(formatted.trim(), baseIndent);
+
+        await editor.edit((editBuilder) => {
+          editBuilder.replace(selection, formattedIndented);
+        });
+      } catch (err) {
+        vscode.window.showErrorMessage('Erro ao formatar');
+        console.error(err);
+      }
+    }
+  );
+
+  context.subscriptions.push(disposable);
 }
 
-// This method is called when your extension is deactivated
+function indentToSelectionBase(text: string, baseIndent: string) {
+  return text
+    .split('\n')
+    .map((line) => (line.trim() ? baseIndent + line : line))
+    .join('\n');
+}
+
+function sortAttributes(html: string) {
+  return html.replace(/<([a-zA-Z-]+)\s+([^>]+)>/g, (match, tag, attrs) => {
+    const parts = attrs.match(/([:@\w-]+)(="[^"]*"|'[^']*'|=[^\s]+)?/g);
+
+    if (!parts) {return match;}
+
+    const getPriority = (attr: string) => {
+      if (attr.startsWith('v-model')) {return 1;}
+      if (attr.startsWith(':')) {return 2;}
+      if (attr.startsWith('@')) {return 4;}
+      return 3;
+    };
+
+    const sorted = parts.sort((a: string, b: string) => {
+      const pa = getPriority(a);
+      const pb = getPriority(b);
+
+      if (pa !== pb) {return pa - pb;}
+
+      return a.localeCompare(b);
+    });
+
+    return `<${tag} ${sorted.join(' ')}>`;
+  });
+}
+
 export function deactivate() {}
