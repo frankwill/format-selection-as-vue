@@ -4,7 +4,7 @@
   "displayName": "Format Selection As VUE",
   "description": "Format the selected text within literal strings in VUE format.",
   "icon": "img/icon.png",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.116.0"
   },
@@ -15,6 +15,7 @@
     "type": "git",
     "url": "https://github.com/frankwill/format-selection-as-vue"
   },
+  "license": "MIT",
   "activationEvents": [
     "onCommand:format-template-string-as-vue.format"
   ],
