@@ -11,6 +11,10 @@
   "categories": [
     "Other"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/frankwill/format-selection-as-vue"
+  },
   "activationEvents": [
     "onCommand:format-template-string-as-vue.format"
   ],
