@@ -1,6 +1,6 @@
 {
   "name": "format-template-string-as-vue",
-  "publisher": "frankwill",
+  "publisher": "frankwsb",
   "displayName": "Format Selection As VUE",
   "description": "Format the selected text within literal strings in VUE format.",
   "version": "0.0.1",
