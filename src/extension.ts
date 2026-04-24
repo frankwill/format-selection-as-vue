@@ -16,14 +16,16 @@ export function activate(context: vscode.ExtensionContext) {
 
       try {
 				const sorted = sortAttributes(selectedText);
+        const safeHtml = ensureSelfClosing(sorted);
 
-				const formatted = await prettier.format(sorted, {
+				const formatted = await prettier.format(safeHtml, {
 					parser: 'html',
 					plugins: [parserHtml],
 					singleAttributePerLine: true,
 				});
 
-				const formattedIndented = indentToSelectionBase(formatted.trim(), baseIndent);
+        const cleaned = removeSelfClosing(formatted);
+				const formattedIndented = indentToSelectionBase(cleaned.trim(), baseIndent);
 
         await editor.edit((editBuilder) => {
           editBuilder.replace(selection, formattedIndented);
@@ -36,6 +38,20 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(disposable);
+}
+
+function removeSelfClosing(html: string) {
+  return html.replace(/<([a-zA-Z-]+)([^>]*)\s*\/>/g, '<$1$2>');
+}
+
+function ensureSelfClosing(html: string) {
+  // se já tiver fechamento, não mexe
+  if (html.includes('</')) {
+    return html;
+  }
+
+  // transforma <tag ...> em <tag ... />
+  return html.replace(/<([a-zA-Z-]+)([^>]*)>$/, '<$1$2 />');
 }
 
 function indentToSelectionBase(text: string, baseIndent: string) {
