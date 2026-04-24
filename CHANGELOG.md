@@ -2,6 +2,11 @@
 
 All notable changes to the "format-template-string-as-vue" extension will be documented in this file.
 
+## [0.0.8] - 24/04/2026
+
+### Fixed
+- Adjust the closing tag when formatting the code.
+
 ## [0.0.7] - 24/04/2026
 
 ### Docs
