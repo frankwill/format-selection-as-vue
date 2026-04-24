@@ -2,9 +2,11 @@
 
 Format the selected text within literal strings in Vue format. Very useful for Vue applications that do not use build stages or SFC's.
 
-> [!IMPORTANT]
-><p>Formatting only the opening of a tag may cause Prettier to automatically add a closing tag, resulting in duplicates.</p>
-><strong>Always select the entire tag (opening + closing), especially for parent elements.</strong>
+<blockquote style="border-left:4px solid #58ABF8; padding:10px;">
+  <strong>ℹ️ IMPORTANT</strong><br>
+  <p>Formatting only the opening of a tag may cause Prettier to automatically add a closing tag, resulting in duplicates.</p>
+  <strong>Always select the entire tag (opening + closing), especially for parent elements.</strong>
+</blockquote>
 
 ## Instruction
 

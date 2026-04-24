@@ -2,6 +2,11 @@
 
 All notable changes to the "format-template-string-as-vue" extension will be documented in this file.
 
+## [0.0.7] - 24/04/2026
+
+### Docs
+- Important note.
+
 ## [0.0.6] - 24/04/2026
 
 ### Docs
