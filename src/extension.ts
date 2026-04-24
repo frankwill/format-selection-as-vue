@@ -45,12 +45,10 @@ function removeSelfClosing(html: string) {
 }
 
 function ensureSelfClosing(html: string) {
-  // se já tiver fechamento, não mexe
   if (html.includes('</')) {
     return html;
   }
 
-  // transforma <tag ...> em <tag ... />
   return html.replace(/<([a-zA-Z-]+)([^>]*)>$/, '<$1$2 />');
 }
 
@@ -68,10 +66,19 @@ function sortAttributes(html: string) {
     if (!parts) {return match;}
 
     const getPriority = (attr: string) => {
-      if (attr.startsWith('v-model')) {return 1;}
-      if (attr.startsWith(':')) {return 2;}
-      if (attr.startsWith('@')) {return 4;}
-      return 3;
+      if (
+        attr.startsWith('v-if') ||
+        attr.startsWith('v-else-if') ||
+        attr.startsWith('v-else')
+      ) {
+        return 1;
+      }
+
+      if (attr.startsWith('v-for')) { return 2; }
+      if (attr.startsWith('v-model')) {return 3;}
+      if (attr.startsWith(':')) {return 4;}
+      if (attr.startsWith('@')) {return 6;}
+      return 5;
     };
 
     const sorted = parts.sort((a: string, b: string) => {
