@@ -1,97 +1,103 @@
-import * as vscode from 'vscode';
-import * as prettier from 'prettier/standalone';
-import * as parserHtml from 'prettier/plugins/html';
+import * as vscode from "vscode";
+import * as prettier from "prettier/standalone";
+import * as parserHtml from "prettier/plugins/html";
 
 export function activate(context: vscode.ExtensionContext) {
   const disposable = vscode.commands.registerCommand(
-    'format-template-string-as-vue.format',
+    "format-template-string-as-vue.format",
     async () => {
       const editor = vscode.window.activeTextEditor;
-      if (!editor) { return; };
+      if (!editor) {
+        return;
+      }
 
       const selection = editor.selection;
       const selectedText = editor.document.getText(selection);
-			const line = editor.document.lineAt(selection.start.line);
-			const baseIndent = line.text.match(/^\s*/)?.[0] ?? '';
+      const line = editor.document.lineAt(selection.start.line);
+      const baseIndent = line.text.match(/^\s*/)?.[0] ?? "";
 
       try {
-				const sorted = sortAttributes(selectedText);
-        const safeHtml = ensureSelfClosing(sorted);
+        const sorted = sortAttributes(selectedText);
 
-				const formatted = await prettier.format(safeHtml, {
-					parser: 'html',
-					plugins: [parserHtml],
-					singleAttributePerLine: true,
-				});
+        const formatted = await prettier.format(sorted, {
+          parser: "html",
+          plugins: [parserHtml],
+          singleAttributePerLine: true,
+        });
 
-        const cleaned = removeSelfClosing(formatted);
-				const formattedIndented = indentToSelectionBase(cleaned.trim(), baseIndent);
+        const formattedIndented = indentToSelectionBase(
+          formatted.trim(),
+          baseIndent,
+        );
 
         await editor.edit((editBuilder) => {
           editBuilder.replace(selection, formattedIndented);
         });
       } catch (err) {
-        vscode.window.showErrorMessage('Erro ao formatar');
+        vscode.window.showErrorMessage("Erro ao formatar");
         console.error(err);
       }
-    }
+    },
   );
 
   context.subscriptions.push(disposable);
 }
 
-function removeSelfClosing(html: string) {
-  return html.replace(/<([a-zA-Z-]+)([^>]*)\s*\/>/g, '<$1$2>');
-}
-
-function ensureSelfClosing(html: string) {
-  if (html.includes('</')) {
-    return html;
-  }
-
-  return html.replace(/<([a-zA-Z-]+)([^>]*)>$/, '<$1$2 />');
-}
-
 function indentToSelectionBase(text: string, baseIndent: string) {
   return text
-    .split('\n')
+    .split("\n")
     .map((line) => (line.trim() ? baseIndent + line : line))
-    .join('\n');
+    .join("\n");
 }
 
 function sortAttributes(html: string) {
-  return html.replace(/<([a-zA-Z-]+)\s+([^>]+)>/g, (match, tag, attrs) => {
-    const parts = attrs.match(/([:@\w-]+)(="[^"]*"|'[^']*'|=[^\s]+)?/g);
+  return html.replace(
+    /<([a-zA-Z-]+)\s+([^>]*?)(\s*\/?)>/g,
+    (match, tag, attrs, closing) => {
+      const cleanAttrs = attrs.trim();
 
-    if (!parts) {return match;}
+      const parts = cleanAttrs.match(/([:@\w-]+)(="[^"]*"|'[^']*'|=[^\s]+)?/g);
 
-    const getPriority = (attr: string) => {
-      if (
-        attr.startsWith('v-if') ||
-        attr.startsWith('v-else-if') ||
-        attr.startsWith('v-else')
-      ) {
-        return 1;
+      if (!parts) {
+        return match;
       }
 
-      if (attr.startsWith('v-for')) { return 2; }
-      if (attr.startsWith('v-model')) {return 3;}
-      if (attr.startsWith(':')) {return 4;}
-      if (attr.startsWith('@')) {return 6;}
-      return 5;
-    };
+      const getPriority = (attr: string) => {
+        if (
+          attr.startsWith("v-if") ||
+          attr.startsWith("v-else-if") ||
+          attr.startsWith("v-else")
+        ) {
+          return 1;
+        }
 
-    const sorted = parts.sort((a: string, b: string) => {
-      const pa = getPriority(a);
-      const pb = getPriority(b);
+        if (attr.startsWith("v-for")) {
+          return 2;
+        }
+        if (attr.startsWith("v-model")) {
+          return 3;
+        }
+        if (attr.startsWith(":")) {
+          return 4;
+        }
+        if (attr.startsWith("@")) {
+          return 6;
+        }
+        return 5;
+      };
 
-      if (pa !== pb) {return pa - pb;}
+      const sorted = parts.sort((a: string, b: string) => {
+        const pa = getPriority(a);
+        const pb = getPriority(b);
+        if (pa !== pb) {
+          return pa - pb;
+        }
+        return a.localeCompare(b);
+      });
 
-      return a.localeCompare(b);
-    });
-
-    return `<${tag} ${sorted.join(' ')}>`;
-  });
+      return `<${tag} ${sorted.join(" ")}${closing}>`;
+    },
+  );
 }
 
 export function deactivate() {}
