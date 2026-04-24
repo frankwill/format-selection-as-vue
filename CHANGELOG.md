@@ -2,6 +2,11 @@
 
 All notable changes to the "format-template-string-as-vue" extension will be documented in this file.
 
+## [0.0.4] - 24/04/2026
+
+### Fixed
+- Adjust the order of Vue attributes in the tags.
+
 ## [0.0.3] - 24/04/2026
 
 ### Fixed
