@@ -23,6 +23,8 @@ export function activate(context: vscode.ExtensionContext) {
           parser: "html",
           plugins: [parserHtml],
           singleAttributePerLine: true,
+          bracketSameLine: false,
+          htmlWhitespaceSensitivity: "ignore",
         });
 
         const formattedIndented = indentToSelectionBase(
