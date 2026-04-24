@@ -2,6 +2,11 @@
 
 All notable changes to the "format-template-string-as-vue" extension will be documented in this file.
 
+## [0.0.5] - 24/04/2026
+
+### Fixed
+- Fixed the bug related to formatting multiple lines of code.
+
 ## [0.0.4] - 24/04/2026
 
 ### Fixed
